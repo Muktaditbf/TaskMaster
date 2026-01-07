@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Task List Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922", "surface-dark": "#1c252e", "surface-light": "#ffffff", "border-dark": "#283039", "border-light": "#e5e7eb" }, fontFamily: { "display": ["Inter", "Noto Sans Bengali", "sans-serif"] } } } }
+    </script>
+    <script>
+        // Check Dark Mode on Load
+        if (localStorage.getItem('tm_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white h-screen flex overflow-hidden font-display">
+
+<div id="nameModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hidden">
+    <div class="bg-surface-light dark:bg-[#1c252e] p-8 rounded-2xl w-full max-w-md border border-border-light dark:border-border-dark">
+        <h2 class="text-2xl font-bold mb-4 text-center">স্বাগতম! 👋</h2>
+        <p class="text-center mb-6 text-gray-500">শুরু করার জন্য আপনার নাম বলুন:</p>
+        <input id="userNameInput" type="text" class="w-full p-3 rounded-lg bg-transparent border border-gray-500 mb-4" placeholder="আপনার নাম...">
+        <button onclick="saveName()" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-600">শুরু করুন</button>
+    </div>
+</div>
+
+<aside class="w-72 bg-surface-light dark:bg-background-dark border-r border-border-light dark:border-border-dark flex flex-col hidden md:flex shrink-0">
+    <div class="p-6 flex flex-col h-full justify-between">
+        <div class="flex flex-col gap-8">
+            <div class="flex gap-4 items-center">
+                <div class="bg-blue-500 rounded-full size-12 flex items-center justify-center text-white font-bold text-xl">TM</div>
+                <div class="flex flex-col">
+                    <h1 class="text-[#111418] dark:text-white text-base font-bold">TaskMaster</h1>
+                    <p class="text-[#637588] dark:text-[#9dabb9] text-sm">ফ্রি প্ল্যান</p>
+                </div>
+            </div>
+            <nav class="flex flex-col gap-2">
+                <a class="group flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#283039] text-white shadow-md" href="index.html">
+                    <span class="material-symbols-outlined filled text-primary">list</span>
+                    <span class="text-sm font-medium">সব কাজ</span>
+                </a>
+                <a class="group flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#f0f2f4] dark:hover:bg-[#1c252e] text-[#637588] dark:text-[#9dabb9]" href="settings.html">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="text-sm font-medium">সেটিংস</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+</aside>
+
+<main class="flex-1 flex flex-col h-full relative">
+    <header class="h-16 flex items-center justify-between px-6 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-background-dark">
+        <div class="flex items-center gap-4">
+            <h2 class="text-xl font-bold">ড্যাশবোর্ড</h2>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="add-task.html" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">add</span> নতুন কাজ
+            </a>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6">
+        <div class="max-w-6xl mx-auto flex flex-col gap-8">
+            <h1 id="welcomeMsg" class="text-3xl font-bold">স্বাগতম! 👋</h1>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="p-5 rounded-xl bg-surface-light dark:bg-[#1c252e] border border-border-light dark:border-[#283039]">
+                    <p class="text-[#637588] dark:text-[#9dabb9] text-sm">মোট কাজ</p>
+                    <p id="totalCount" class="text-3xl font-bold mt-1">0</p>
+                </div>
+                <div class="p-5 rounded-xl bg-surface-light dark:bg-[#1c252e] border border-border-light dark:border-[#283039]">
+                    <p class="text-[#637588] dark:text-[#9dabb9] text-sm">সম্পন্ন</p>
+                    <p id="doneCount" class="text-3xl font-bold mt-1 text-green-500">0</p>
+                </div>
+                <div class="p-5 rounded-xl bg-surface-light dark:bg-[#1c252e] border border-border-light dark:border-[#283039]">
+                    <p class="text-[#637588] dark:text-[#9dabb9] text-sm">বাকি আছে</p>
+                    <p id="pendingCount" class="text-3xl font-bold mt-1 text-orange-500">0</p>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-bold">চলমান কাজসমূহ</h3>
+            <div id="taskListContainer" class="flex flex-col gap-3">
+                <p class="text-gray-500 text-sm">লোড হচ্ছে...</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Name Check
+        const name = localStorage.getItem('tm_username');
+        if (!name) {
+            document.getElementById('nameModal').classList.remove('hidden');
+        } else {
+            document.getElementById('welcomeMsg').innerText = `স্বাগতম, ${name}! 👋`;
+        }
+        loadTasks();
+    });
+
+    function saveName() {
+        const inputName = document.getElementById('userNameInput').value;
+        if(inputName) {
+            localStorage.setItem('tm_username', inputName);
+            document.getElementById('nameModal').classList.add('hidden');
+            document.getElementById('welcomeMsg').innerText = `স্বাগতম, ${inputName}! 👋`;
+        }
+    }
+
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tm_tasks')) || [];
+        
+        // Update Stats
+        document.getElementById('totalCount').innerText = tasks.length;
+        document.getElementById('doneCount').innerText = tasks.filter(t => t.done).length;
+        document.getElementById('pendingCount').innerText = tasks.filter(t => !t.done).length;
+
+        // Render List
+        const listDiv = document.getElementById('taskListContainer');
+        listDiv.innerHTML = ''; 
+        
+        if (tasks.length === 0) {
+            listDiv.innerHTML = '<p class="text-gray-500">কোন কাজ নেই। "নতুন কাজ" বাটনে ক্লিক করুন।</p>';
+            return;
+        }
+
+        tasks.forEach((task, index) => {
+            listDiv.innerHTML += `
+            <div class="p-4 rounded-xl bg-surface-light dark:bg-[#1c252e] border border-border-light dark:border-[#283039] flex justify-between items-center group">
+                <div class="flex items-center gap-4">
+                    <input type="checkbox" onchange="toggleDone(${index})" ${task.done ? 'checked' : ''} class="size-5 rounded border-gray-500 bg-transparent text-primary focus:ring-0 cursor-pointer">
+                    <div class="${task.done ? 'opacity-50 line-through' : ''}">
+                        <h4 class="font-medium text-[#111418] dark:text-white">${task.title}</h4>
+                        <span class="text-xs text-blue-400 bg-blue-900/20 px-2 py-0.5 rounded border border-blue-900/30">${task.desc || 'সাধারণ'}</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold ${getPriorityColor(task.priority)} px-2 py-1 rounded">${task.priority}</span>
+                    <button onclick="deleteTask(${index})" class="text-gray-500 hover:text-red-500"><span class="material-symbols-outlined">delete</span></button>
+                </div>
+            </div>`;
+        });
+    }
+
+    function getPriorityColor(p) {
+        if(p === 'উচ্চ') return 'text-red-400 bg-red-900/20';
+        if(p === 'মাঝারি') return 'text-yellow-400 bg-yellow-900/20';
+        return 'text-green-400 bg-green-900/20';
+    }
+
+    function toggleDone(index) {
+        const tasks = JSON.parse(localStorage.getItem('tm_tasks')) || [];
+        tasks[index].done = !tasks[index].done;
+        localStorage.setItem('tm_tasks', JSON.stringify(tasks));
+        loadTasks();
+    }
+
+    function deleteTask(index) {
+        if(confirm('মুছে ফেলতে চান?')) {
+            const tasks = JSON.parse(localStorage.getItem('tm_tasks')) || [];
+            tasks.splice(index, 1);
+            localStorage.setItem('tm_tasks', JSON.stringify(tasks));
+            loadTasks();
+        }
+    }
+</script>
+</body>
+</html>

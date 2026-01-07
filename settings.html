@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#137fec", "background-dark": "#101922", "surface-dark": "#1c2630" }, fontFamily: { "display": ["Inter", "sans-serif"] } } } }
+    </script>
+    <script>
+        // Apply theme immediately on load
+        if (localStorage.getItem('tm_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+<body class="bg-[#f6f7f8] dark:bg-background-dark text-[#111418] dark:text-white font-display h-screen flex overflow-hidden">
+
+<aside class="w-64 bg-white dark:bg-surface-dark border-r border-[#283039] hidden md:flex flex-col p-4 gap-4">
+    <div class="text-xl font-bold px-2">TaskMaster</div>
+    <nav class="flex flex-col gap-2">
+        <a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-[#283039]">
+            <span class="material-symbols-outlined">list</span> Tasks
+        </a>
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#283039] text-white">
+            <span class="material-symbols-outlined filled">settings</span> Settings
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 p-8 overflow-y-auto">
+    <div class="max-w-3xl mx-auto">
+        <header class="flex items-center gap-4 mb-8 md:hidden">
+            <a href="index.html" class="text-gray-500"><span class="material-symbols-outlined">arrow_back</span></a>
+            <h1 class="text-2xl font-bold">Settings</h1>
+        </header>
+
+        <h1 class="text-3xl font-bold mb-8 hidden md:block">Settings</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div onclick="setTheme('dark')" id="btnDark" class="p-4 rounded-xl bg-white dark:bg-surface-dark border-2 border-transparent cursor-pointer flex items-center gap-4 shadow-sm hover:border-primary transition-all">
+                <span class="material-symbols-outlined">dark_mode</span>
+                <div>
+                    <p class="font-bold">Dark Mode</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Easier on the eyes</p>
+                </div>
+                <div class="ml-auto size-4 rounded-full border border-gray-400 dark:border-gray-600 bg-transparent" id="radioDark"></div>
+            </div>
+
+            <div onclick="setTheme('light')" id="btnLight" class="p-4 rounded-xl bg-white dark:bg-surface-dark border-2 border-transparent cursor-pointer flex items-center gap-4 shadow-sm hover:border-primary transition-all">
+                <span class="material-symbols-outlined">light_mode</span>
+                <div>
+                    <p class="font-bold">Light Mode</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Classic bright look</p>
+                </div>
+                <div class="ml-auto size-4 rounded-full border border-gray-400 dark:border-gray-600 bg-transparent" id="radioLight"></div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-surface-dark rounded-xl p-6 shadow-sm">
+            <label class="block text-sm font-medium mb-2">Reset Data</label>
+            <p class="text-sm text-gray-500 mb-4">Clear all tasks and your name.</p>
+            <button onclick="resetApp()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Reset Everything</button>
+        </div>
+        
+        <div class="mt-8 flex justify-end">
+            <a href="index.html" class="bg-primary hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold">Go to Dashboard</a>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Initialize UI on load
+    document.addEventListener("DOMContentLoaded", () => {
+        const currentTheme = localStorage.getItem('tm_theme') || 'light';
+        updateSelection(currentTheme);
+    });
+
+    function setTheme(theme) {
+        localStorage.setItem('tm_theme', theme);
+        
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateSelection(theme);
+    }
+
+    function updateSelection(theme) {
+        // Reset styles
+        document.getElementById('btnDark').classList.remove('border-primary');
+        document.getElementById('btnLight').classList.remove('border-primary');
+        document.getElementById('radioDark').classList.remove('bg-primary', 'border-primary');
+        document.getElementById('radioLight').classList.remove('bg-primary', 'border-primary');
+
+        // Apply active style
+        if (theme === 'dark') {
+            document.getElementById('btnDark').classList.add('border-primary');
+            document.getElementById('radioDark').classList.add('bg-primary', 'border-primary');
+        } else {
+            document.getElementById('btnLight').classList.add('border-primary');
+            document.getElementById('radioLight').classList.add('bg-primary', 'border-primary');
+        }
+    }
+
+    function resetApp() {
+        if(confirm("Are you sure? This will delete all tasks.")) {
+            localStorage.clear();
+            alert("Reset complete.");
+            window.location.href = "index.html";
+        }
+    }
+</script>
+</body>
+</html>
